@@ -1,0 +1,9 @@
+//Test File
+
+var:int num1 = 3;
+var:int num2 = 1;
+var:string str =  "Hello!";
+fn:void add(int arg1, int arg2){
+	return arg1 + arg2 ;
+}
+
