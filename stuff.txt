@@ -1,0 +1,33 @@
+compiler = pacl
+grapher = grapher
+
+
+compiler_sources = $(wildcard src/compiler/*.c)
+grapher_sources = $(wildcard src/grapher/*.c)
+includes = $(wildcard src/include/*.h)
+
+compiler_objects = $(compiler_sources:.c=.o)
+grapher_objects = $(grapher_sources:.c=.o)
+
+flags = -g -Wall
+
+all: compiler grapher
+
+clean:
+	-rm bin/*
+	-rm ./**//**/*.o
+
+%.o: %.c src/include/%.h 
+	gcc -c $(flags) $< -o $@
+
+compiler: $(compiler_objects)
+	ld -o bin/$(compiler) $^ -g
+	xxd -b bin/$(compiler) >> bin/$(compiler).txt
+
+grapher: $(grapher_objects)
+	ld -o bin/$(grapher) $^ -g
+	xxd -b bin/$(grapher) >> bin/$(grapher).txt
+
+install:
+	make
+	cp bin/pacl /usr/local/bin/pacl

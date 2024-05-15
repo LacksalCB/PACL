@@ -1,0 +1,25 @@
+PACL TAKE TWO: LARGELY THE SAME BUT WITH A FEW DIFFERENCES TO MAKE IT LESS BAD AND IT'S MOSTLY ACTUALLY MY CODE LOL
+
+8MB default on stack for a program.  If it exceeds this, space is allocated later to account for it (id assume that there is a counter for
+how many variables/functions there are.  
+
+COMPILATION STEPS FOR MY OWN SANITY:
+1. Read file (seems arbitrary, but I want to be exact.
+	a. Check for file extension should be in main not read write.  Or maybe should be in read write under separate function (maintainability principles)
+	b. Read file assuming it exists and is the correct file type.  
+2. Lexing import the file and lex step by step using parser. 
+	Not exactly steps as it's kinda constantly ongoing as necessary, but:
+	a. Ignore whitespace/tabs/comments - literally just advance the lexer char until a readable token is met. 
+	b. Add identifiers to parser (variable/function identifiers, types, names, values)
+		i. For values, int consts etc, and string/char consts which are a separate issue
+	c. Add Symbols/non-alphanumeric tokens to parser (parentheses, commas, periods, etc)
+3. Parse lexer output by token and add to AST.  It is kinda difficult to write these steps as up until semantic analysis is ongoing token by token. 
+	NOTE: I think the old system I read of separating stuff was overkill and largely bloat, but I don't have a great understanding of this, but that's 
+	also kind of the point of me even doing this is to learn stuff but also to do what I can on my own.
+	a. Parse into statements (lines of code effectively) (sure, but not a great way to put it)
+	b. 
+
+AST STRUCTURE
+	a. 
+
+
