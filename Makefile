@@ -1,32 +1,32 @@
-compiler = pacl
-grapher = grapher
+CC = gcc
 
+SRC_DIR = src
+BUILD_DIR = build
+BIN_DIR = bin
 
-compiler_sources = $(wildcard src/compiler/*.c)
-grapher_sources = $(wildcard src/grapher/*.c)
+EXEC = $(BIN_DIR)/pacl
 
-compiler_objects = $(compiler_sources:.c=.o)
-grapher_objects = $(grapher_sources:.c=.o)
+SOURCES = $(wildcard $(SRC_DIR)/*.c)
+OBJECTS = $(SOURCES:$(SRC_DIR)%.c=$(BUILD_DIR)%.o)
 
-flags = -g -Wall
+CFLAGS = -g -Og -Wall -Wextra -pedantic -fsanitize=address
+LDFLAGS = -g -Og -Wall -Wextra -pedantic -fsanitize=address
 
-all: compiler grapher
+.PHONY: all clean install
 
-clean:
-	-rm bin/*
-	-rm ./**//**/*.o
+all: $(EXEC)
 
-compiler: $(compiler_objects)
-	gcc $(compiler_objects) $(flags) -o bin/$(compiler)
-	xxd -b bin/$(compiler) >> bin/$(compiler).txt
+$(EXEC): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $(EXEC) $(LDFLAGS)
+	xxd -b $(EXEC) >> logs/pacl.txt
 
-grapher: $(grapher_objects)
-	gcc $(grapher_objects) $(flags) -o bin/$(grapher)
-	xxd -b bin/$(grapher) >> bin/$(grapher).txt
-
-%.o: %.c include/%.h 
-	gcc -c $(flags) $< -o $@
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c 
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 install:
 	make
 	cp bin/pacl /usr/local/bin/pacl
+
+clean:
+	-rm $(EXEC)
+	-rm $(OBJECTS)
