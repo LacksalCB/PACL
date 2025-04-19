@@ -21,3 +21,19 @@ void parser_eat(parser_t* parser, int type){
 	}
 }
 
+ast_t* parser_parse_statement(token_t** token_list, int* token_count) {
+	
+	ast_t* ast = malloc(1 * sizeof(struct AST_STRUCT));	
+	return ast;
+}
+
+ast_t** parser_parse(token_t** token_list, int* token_count) {
+	for (int i = 0; i < *token_count; i++) {
+		printf("%s, %d\n", token_list[i]->value, token_list[i]->type);
+	}
+
+	ast_t** ast = malloc(1 * sizeof(struct AST_STRUCT*));
+
+	return ast;
+}
+

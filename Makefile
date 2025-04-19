@@ -1,16 +1,18 @@
 CC = gcc
 
 SRC_DIR = src
+LOG_DIR = logs
 BUILD_DIR = build
 BIN_DIR = bin
 
 EXEC = $(BIN_DIR)/pacl
+LOGS = $(wildcard $(LOG_DIR)/*.txt)
 
 SOURCES = $(wildcard $(SRC_DIR)/*.c)
 OBJECTS = $(SOURCES:$(SRC_DIR)%.c=$(BUILD_DIR)%.o)
 
 CFLAGS = -g -Og -Wall -Wextra -pedantic -fsanitize=address
-LDFLAGS = -g -Og -Wall -Wextra -pedantic -fsanitize=address
+LDFLAGS = -g -Og -Wall -Wextra -pedantic -fsanitize=address 
 
 .PHONY: all clean install
 
@@ -30,3 +32,4 @@ install:
 clean:
 	-rm $(EXEC)
 	-rm $(OBJECTS)
+	-rm $(LOGS)

@@ -24,15 +24,12 @@ typedef struct TOKEN_STRUCT {
 		TOKEN_PLUS, 		// 17
 		TOKEN_SLASH, 		// 18
 		TOKEN_MOD, 			// 19
-		
-		// TOKEN COMPLEX DATA
-		TOKEN_STRUCT, 	// 20
-		TOKEN_ENUM, 	// 21
 
 		// TOKEN IDENTIFIERS
-		TOKEN_ID, 		// 22
-		TOKEN_VAR, 		// 23
-		TOKEN_FN 		// 24
+		TOKEN_ID, 		// 20
+
+		// EOF
+		TOKEN_EOF 		// 21
 	}type;
 	char* value;
 }token_t;

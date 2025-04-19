@@ -11,7 +11,7 @@ typedef struct LEXER_STRUCT{
 	int linech;
 }lexer_t;
 
-lexer_t* init_lexer(const char* buff);
+lexer_t* init_lexer(char* buff);
 
 lexer_t* lexer_eat(lexer_t* lexer);
 char* to_string(lexer_t* lexer);
@@ -23,6 +23,6 @@ token_t* lexer_collect_string(lexer_t* lexer);
 
 token_t* lexer_advance(lexer_t* lexer);
 
-token_t** tokenize(const char* buff);
+token_t** lexer_tokenize(char* buff, int* token_count);
 
 #endif /* PACL_LEXER_H */
