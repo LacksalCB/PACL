@@ -5,18 +5,23 @@
 char* buff;
 token_t** token_list;
 int token_count = 0;
-ast_t** ast;
+ast_t* ast;
 
 void dealloc() {
 	free(buff);
 
-	for (int i = 0; i < token_count; i++) {
-		free(token_list[i]->value);
-		free(token_list[i]);
+	for (int i = 1; i < token_count; i++) {
+		free(token_list[i-1]->value);
+		free(token_list[i-1]);
 	}
+	free(token_list[token_count]);
 	
 	free(token_list);
-	free(ast);
+
+	for (int i = 0; i < 1; i++) {
+		//free(ast[i]);
+	}
+	free(ast->statement->expression->term->factor->id);
 }
 
 int main(int argc, char** argv){
@@ -26,7 +31,7 @@ int main(int argc, char** argv){
 
 	buff = read_file(argv[1]);
 	token_list = lexer_tokenize(buff, &token_count);
-	ast = parser_parse(token_list, &token_count);
+	ast = parser_parse(token_list);
 	
 	dealloc();
 	return 0;

@@ -23,3 +23,16 @@ AST STRUCTURE
 	a. 
 
 
+
+Effectively creating a deterministic CFL to represent language in AST
+Phase 0 Design -> Mathematical Expression Parser:
+	<stmt> ::= <id> = <exp> | <exp>
+	<exp> ::= <term> | <exp> + <term> | <exp> - <term>
+	<term> ::= <factor> | <term> * <factor> | <term> / <factor>
+	<factor> ::= <id> | <exp>
+	<id> ::= [09azAZ]*
+
+
+			
+
+

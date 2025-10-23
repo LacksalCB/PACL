@@ -136,9 +136,12 @@ token_t** lexer_tokenize(char* buff, int* token_count) {
 		*token_count += 1;	
 	}
 
+	token_t* end_token = init_token(NULL, TOKEN_EOF);
+	token_list = realloc(token_list, (*token_count+1) * sizeof(token_t*));
+	token_list[*token_count] = end_token;
+
 	free(lexer->contents);
 	free(lexer);
-	*token_count -= 1; // Account for final null character
 	return token_list;
 }
 
