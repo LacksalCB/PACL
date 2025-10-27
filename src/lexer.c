@@ -56,7 +56,7 @@ token_t* lexer_get_token(lexer_t* lexer){
 	tok[len] = '\0';
 	lexer->i += len-1;
 	lexer_eat(lexer);
-	return init_token(tok, TOKEN_ID);
+	return isdigit(tok[0]) ? init_token(tok, TOKEN_NUM) : init_token(tok, TOKEN_ID); // Returns ID if alphabet chars, returns num (i.e. const literal) if digit
 }
 
 token_t* lexer_collect_string(lexer_t* lexer){
@@ -130,11 +130,20 @@ token_t** lexer_tokenize(char* buff, int* token_count) {
 	token_t** token_list = malloc(1 * sizeof(struct TOKEN_STRUCT*));
 	lexer_t* lexer = init_lexer(buff);
 
+	FILE* fptr = fopen("tokens.txt", "r");	
+
 	while (lexer->c != 0) {
 		token_list = realloc(token_list, (*token_count+1) * sizeof(token_t*));
 		token_list[*token_count] = lexer_advance(lexer);
+
+		fwrite(&token_list[*token_count]->type, sizeof(int), 1, fptr);
+		puts(token_list[*token_count]->value);
+		fwrite(token_list[*token_count]->value, sizeof(char), strlen(token_list[*token_count]->value), fptr);
+		
 		*token_count += 1;	
 	}
+
+	fclose(fptr);
 
 	token_t* end_token = init_token(NULL, TOKEN_EOF);
 	token_list = realloc(token_list, (*token_count+1) * sizeof(token_t*));

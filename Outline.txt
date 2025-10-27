@@ -29,10 +29,8 @@ Phase 0 Design -> Mathematical Expression Parser:
 	<stmt> ::= <id> = <exp> | <exp>
 	<exp> ::= <term> | <exp> + <term> | <exp> - <term>
 	<term> ::= <factor> | <term> * <factor> | <term> / <factor>
-	<factor> ::= <id> | <exp>
+	<factor> ::= <id> | (<exp>)
 	<id> ::= [09azAZ]*
 
-
-			
-
+For prototyping purposes, have the lexer be in C and read the file, pass that output to a python program to format the output token list into a proper List that ocaml can then parse (i.e. [token_t * string]
 

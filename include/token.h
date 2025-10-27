@@ -27,9 +27,10 @@ typedef struct TOKEN_STRUCT {
 
 		// TOKEN IDENTIFIERS
 		TOKEN_ID, 		// 20
+		TOKEN_NUM,  	// 21
 
 		// EOF
-		TOKEN_EOF 		// 21
+		TOKEN_EOF 		// 22
 	}type;
 	char* value;
 }token_t;

@@ -16,7 +16,7 @@ LDFLAGS = -g -Og -Wall -Wextra -pedantic -fsanitize=address
 
 .PHONY: all clean install
 
-all: $(EXEC)
+all: $(EXEC) ocaml
 
 $(EXEC): $(OBJECTS)
 	$(CC) $(OBJECTS) -o $(EXEC) $(LDFLAGS)
@@ -24,6 +24,10 @@ $(EXEC): $(OBJECTS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c 
 	$(CC) -c $< -o $@ $(CFLAGS)
+
+ocaml: 
+	ocamlc -o bin/pacl_ocaml src/ocaml/parser.ml
+	./bin/pacl_ocaml
 
 install:
 	make
