@@ -26,11 +26,13 @@ AST STRUCTURE
 
 Effectively creating a deterministic CFL to represent language in AST
 Phase 0 Design -> Mathematical Expression Parser:
-	<stmt> ::= <id> = <exp> | <exp>
+	<stmt> ::= <id> = <exp> 
 	<exp> ::= <term> | <exp> + <term> | <exp> - <term>
 	<term> ::= <factor> | <term> * <factor> | <term> / <factor>
-	<factor> ::= <id> | (<exp>)
-	<id> ::= [09azAZ]*
+	<factor> ::= <var> | <num> | (<exp>)
+	<var> ::= [azAz_*09azAZ*]
+	<num> ::= [09]*
 
-For prototyping purposes, have the lexer be in C and read the file, pass that output to a python program to format the output token list into a proper List that ocaml can then parse (i.e. [token_t * string]
+For prototyping purposes, have the lexer be in C and read the file, pass that output to a python program to format the output token list into a 
+proper List that ocaml can then parse (i.e. [token_t * string]
 
