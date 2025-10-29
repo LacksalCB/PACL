@@ -1,0 +1,69 @@
+The overarching design is to implement a C/C++ like language which is best suited for graphics processing/programming.  
+
+Background:
+I have dabbled in compiler/language design before, so I was hoping to create my own language.  Additionally, I have some experience with graphics programming (e.g. I have dabbled in OpenGL and GTK/GTKMM for C/C++).  My greatest takeaway from these experiences was that these libraries are difficult to use and even harder to learn.  I believe that much of the struggle was rooted in the fact that C++ (and especially C) are not designed in such a way that benefits graphics processing.  The functional/procedural nature of C makes simple tasks rather complicated, and the generally bloated (and frankly confusing) nature of C++ makes nearly any task incur great amounts of boilerplate.  My goal is to create a language with similar syntax, but with a design that is more appropriate for graphics programming.  
+
+Rough Design:
+Procedural in nature, with some OOP elements to simplify graphics object handling
+Optional classes, can simply write more functional style code for non-graphics programming
+Option to create classes (in a somewhat similar style to C++, but cleaner I hope)
+(Ideally) Strongly Statically typed
+Support for some sort of class (which is more advanced than a C struct, but formatted differently from C++ classes)
+An obvious goal is that the language has to be efficient.  I generally plan on making it hybrid between compiled and interpreted:
+My ultimate plan is to make the language compile down to a sort of byte-code (for cross-platform support)
+As a first step, the language will be fully compiled down to x86 assembly, then assembled using the GNU assembler (gas)
+As a first-first step, it may compile down to C, then get compiled by the GNU C compiler (gcc)
+Ideally component-based as I believe this directly benefits and simplifies graphics processing
+
+VERY ROUGH CODE SNIPPETS:
+
+
+CLASSES:
+
+class ClassName = {
+	VARS (
+		INTS:
+			int_name = 1;
+		FLOATS:
+			float_name = 1.0;
+		STRINGS:
+			string_name = "Hello, World!";
+		ARRAYS:
+			INT_ARR:
+				int_arr_name = {1, 2};
+			STRING_ARR:
+				string_name = {"Hello", "World!"};
+	);
+
+	FUNCTIONS (
+		VOID:
+			void_function_name([type] arg1, [type] arg2);
+	);
+
+};
+
+
+FUNCTIONS:
+
+Similar to C style
+
+[type] function_name([type] arg1, [type] arg2) {
+	[type] var = [val];
+	return var;
+}
+
+CUSTOM TYPES:
+
+(Inspired by OCaml)
+type newtype {
+	| Char of char
+	| Int of int
+};
+
+newtype newtype_instance = {'a', 1};
+
+OR
+
+newtype newtype_instance;
+newtype_instance[0] = 'c';
+newtype_instance[0] = 1;

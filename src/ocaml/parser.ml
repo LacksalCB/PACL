@@ -25,11 +25,11 @@ type factor =
 
 type term = 
 	| Term of factor
-	| Term_op of term_ops * term * factor 
+	| Term_op of term * term_ops * factor 
 
 type expression = 
 	| Expression of term
-	| Expression_op of expr_ops * expression * term
+	| Expression_op of expression * expr_ops * term
 	
 type statement = 
 	| Statement of id * expression
@@ -48,6 +48,7 @@ let parser = function
 			| (T_id, x), (T_id, y) -> Statement(Var(x), Expression(Term(Factor(Var(y)))))
 			| (T_id, x), (T_num, n) -> Statement(Var(x), Expression(Term(Factor(Num(n)))))
 			| _, _ -> failwith ("Invalid Expression"))
+	(* Pop D off, analyze, and add to statement *)
 (*
 		| (T_symbol, "+") -> (match (a, c) with
 			| (T_id, _), (T_id, _) -> "Addition with IDs"
@@ -75,3 +76,6 @@ in assert (parser tokens = Statement(Var("x"), Expression(Term(Factor(Var("y")))
 
 let tokens = [(T_id), "x"; (T_symbol), "="; (T_num), "3"]
 in assert (parser tokens = Statement(Var("x"), Expression(Term(Factor(Num"3")))));
+
+let tokens = [(T_id_), "x"; (T_symbol), "="; (T_num), "1"; (T_symbol) "+"; (T_num) "2"]
+in assert (parser tokens = Statement(Var("x"), Expression_op(Expression(Term(Factor(Num("1")))), Add, Term(Factor(Num("2")))));
