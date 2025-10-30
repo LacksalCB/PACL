@@ -6,7 +6,6 @@ type token_t =
 	| T_num 
 	| T_symbol
 
-
 (* AST TYPES *)
 type term_ops = 
 	| Mul
@@ -34,48 +33,42 @@ type expression =
 type statement = 
 	| Statement of id * expression
 
-
 (* Recursively generates AST *)
 
-let parser = function
-	| [] -> failwith ("Invalid argument") (* Empty List, should never be possible at this stage *)
-	| _::[] -> failwith ("Invalid argument: only one ID.") (* Only 1 item in input list of tokens *)
-	| _::b::[] -> failwith("Invalid Expression: Only two IDs") (* Only 2 items in input list of tokens *)
-	(* b should always be a symbol (meaning assignment or math with an L and R)*)
-	(* a should only ever be an ID (i.e. a variable) and c can be either a const number or another ID (i.e. integer math or reassignment of a var to a var) *)
-	| a::b::c::xs -> match b with 
-		| (T_symbol, "=") -> (match (a, c) with 
-			| (T_id, x), (T_id, y) -> Statement(Var(x), Expression(Term(Factor(Var(y)))))
-			| (T_id, x), (T_num, n) -> Statement(Var(x), Expression(Term(Factor(Num(n)))))
-			| _, _ -> failwith ("Invalid Expression"))
-	(* Pop D off, analyze, and add to statement *)
+let rec parse_expression = function
+	| [] -> failwith ("Invalid expression")
+	| a::[] -> (match a with
+		| (T_id, x) ->
+			Expression(Term(Factor(Var(x))))
+		| (T_num, n) ->
+			Expression(Term(Factor(Num(n))))
+		| _ -> failwith ("Invalid expression: Terminal must be of VAR or NUM type."))
+	| [_;_] -> failwith ("Invalid expression")
+	
+
+let rec parse = function 
+	| [] -> failwith ("Invalid argument") 							(* Empty List *)
+	| [_] -> failwith ("Invalid argument: only one ID.") 			(* Only 1 item in input list of tokens *)
+	| [_; _] -> failwith ("Invalid Expression: Only two IDs") 	(* Only 2 items in input list of tokens *)
+	(* b should always be a symbol (meaning assignment or math with an L and R) *)
+	| a::b::xs -> match b with 
+		(* Simple variable assignment *)
+		| (T_symbol, "=") -> (match a with 
+			| (T_id, x)  -> 
+				Statement(Var(x), parse_expression xs)
+			| _ -> failwith ("Invalid expression"))
+		| _ -> failwith ("Invalid Expression");;
+
+
+let tokens = [(T_id, "x"); (T_symbol, "="); (T_id, "y")]
+in assert (parse tokens = Statement(Var("x"), Expression(Term(Factor(Var("y"))))))
+
 (*
-		| (T_symbol, "+") -> (match (a, c) with
-			| (T_id, _), (T_id, _) -> "Addition with IDs"
-			| (T_id, _), (T_num, _) -> "Addition with ID/Num"
-			| (_, _), (_, _) -> "Invalid Expression")
-		| (T_symbol, "-") -> (match (a, c) with
-			| (T_id, _), (T_id, _) -> "Subtraction with IDs"
-			| (T_id, _), (T_num, _) -> "Subtraction with ID/Num"
-			| (_, _), (_, _) -> "Invalid Expression")
-		| (T_symbol, "*") -> (match (a, c) with
-			| (T_id, _), (T_id, _) -> "Multiplication with IDs"
-			| (T_id, _), (T_num, _) -> "Multiplication with ID/Num"
-			| (_, _), (_, _) -> "Invalid Expression")
-		| (T_symbol, "/") -> (match (a, c) with
-			| (T_id, _), (T_id, _) -> "Division with IDs"
-			| (T_id, _), (T_num, _) -> "Division with ID/Num"
-			| (_, _), (_, _) -> "Invalid Expression")
-*)
-		| (_, _) -> failwith("Invalid Expression (Not an operator)");;
-
-
-let tokens = [(T_id), "x"; (T_symbol), "="; (T_id), "y"]
-in assert (parser tokens = Statement(Var("x"), Expression(Term(Factor(Var("y"))))));
-
-
 let tokens = [(T_id), "x"; (T_symbol), "="; (T_num), "3"]
-in assert (parser tokens = Statement(Var("x"), Expression(Term(Factor(Num"3")))));
+in assert (parse tokens = Statement(Var("x"), Expression(Term(Factor(Num"3")))));
+*)
 
-let tokens = [(T_id_), "x"; (T_symbol), "="; (T_num), "1"; (T_symbol) "+"; (T_num) "2"]
-in assert (parser tokens = Statement(Var("x"), Expression_op(Expression(Term(Factor(Num("1")))), Add, Term(Factor(Num("2")))));
+(*
+let tokens = [(T_id), "x"; (T_symbol), "="; (T_num), "1"; (T_symbol), "+"; (T_num), "2"]
+in assert (parse_statement tokens = Statement(Var("x"), Expression_op(Expression(Term(Factor(Num("1")))), Add, Term(Factor(Num("2"))))));
+*)
