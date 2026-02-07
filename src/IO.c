@@ -3,13 +3,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char* read_file(char* filename){
+char* read_file(char* filename) {
 	FILE* fptr = fopen(filename, "r");
 
 	if(fptr == NULL){
 		perror("IO ERROR: File does not exist.\n");
 		exit(1);
-	}else{
+	} else {
 		fseek(fptr, 0, SEEK_END);
 		long fsize = ftell(fptr);
 		fseek(fptr, 0, SEEK_SET);
@@ -23,3 +23,15 @@ char* read_file(char* filename){
 	}
 	return "Error";
 }
+
+void write_file(char* filename, char* buffer) {
+	FILE* fptr = fopen(filename, "w");
+
+	if (fptr == NULL) {
+		perror("IO ERROR: Failed to create file.\n");
+		exit(1);
+	}
+	fputs(buffer, fptr);
+	fclose(fptr);
+}
+

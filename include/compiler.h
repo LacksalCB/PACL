@@ -5,5 +5,6 @@
 #include "lexer.h"
 #include "parser.h"
 #include "ast.h"
+#include "c_generator.h"
 
 #endif /* PACL_COMPILER_H */

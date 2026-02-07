@@ -33,23 +33,69 @@ type expression =
 type statement = 
 	| Statement of id * expression
 
-(* Recursively generates AST *)
+(* This is basically the next step 
+let rec parse_term = function 
+ 	| blah
+
+*)
 
 let rec parse_expression = function
 	| [] -> failwith ("Invalid expression")
+	| [_;_] -> failwith ("Invalid expression")
 	| a::[] -> (match a with
 		| (T_id, x) ->
 			Expression(Term(Factor(Var(x))))
 		| (T_num, n) ->
 			Expression(Term(Factor(Num(n))))
 		| _ -> failwith ("Invalid expression: Terminal must be of VAR or NUM type."))
-	| [_;_] -> failwith ("Invalid expression")
+	| a::b::c::xs -> match b with
+		| (T_symbol, "+") -> (match (a, c) with 
+			| (T_id, x), (T_id, y) ->
+				Expression_op(Expression(Term(Factor(Var(x)))), Add, Term(Factor(Var(y))))
+			| (T_id, x), (T_num, y) ->
+				Expression_op(Expression(Term(Factor(Var(x)))), Add, Term(Factor(Num(y))))
+			| (T_num, x), (T_id, y) ->
+				Expression_op(Expression(Term(Factor(Num(x)))), Add, Term(Factor(Var(y))))
+			| (T_num, x), (T_num, y) ->
+				Expression_op(Expression(Term(Factor(Num(x)))), Add, Term(Factor(Num(y))))
+			| _, _ -> failwith ("Invalid Expression: Malformed operation (bad addition)"))
+		| (T_symbol, "-") -> (match (a, c) with 	
+			| (T_id, x), (T_id, y) ->
+				Expression_op(Expression(Term(Factor(Var(x)))), Sub, Term(Factor(Var(y))))
+			| (T_id, x), (T_num, y) ->
+				Expression_op(Expression(Term(Factor(Var(x)))), Sub, Term(Factor(Num(y))))
+			| (T_num, x), (T_id, y) ->
+				Expression_op(Expression(Term(Factor(Num(x)))), Sub, Term(Factor(Var(y))))
+			| (T_num, x), (T_num, y) ->
+				Expression_op(Expression(Term(Factor(Num(x)))), Sub, Term(Factor(Num(y))))
+			| _, _ -> failwith ("Invalid Expression: Malformed operation (bad subtraction)"))
+		| (T_symbol, "*") -> (match (a, c) with 	
+			| (T_id, x), (T_id, y) ->
+				Expression(Term_op(Term(Factor(Var(x))), Mul, Factor(Var(y))))
+			| (T_id, x), (T_num, y) ->
+				Expression(Term_op(Term(Factor(Var(x))), Mul, Factor(Num(y))))
+			| (T_num, x), (T_id, y) ->
+				Expression(Term_op(Term(Factor(Num(x))), Mul, Factor(Var(y))))
+			| (T_num, x), (T_num, y) ->
+				Expression(Term_op(Term(Factor(Num(x))), Mul, Factor(Num(y))))
+			| _, _ -> failwith ("Invalid Expression: Malformed operation (bad multiplication)"))
+		| (T_symbol, "/") -> (match (a, c) with
+			| (T_id, x), (T_id, y) ->
+				Expression(Term_op(Term(Factor(Var(x))), Div, Factor(Var(y))))
+			| (T_id, x), (T_num, y) ->
+				Expression(Term_op(Term(Factor(Var(x))), Div, Factor(Num(y))))
+			| (T_num, x), (T_id, y) ->
+				Expression(Term_op(Term(Factor(Num(x))), Div, Factor(Var(y))))
+			| (T_num, x), (T_num, y) ->
+				Expression(Term_op(Term(Factor(Num(x))), Div, Factor(Num(y)))) 	
+			| _, _ -> failwith ("Invalid Expression: Malformed operation (bad division)"))
+		| _ -> failwith ("Invalid expression: unknown operator.")
 	
 
 let rec parse = function 
 	| [] -> failwith ("Invalid argument") 							(* Empty List *)
 	| [_] -> failwith ("Invalid argument: only one ID.") 			(* Only 1 item in input list of tokens *)
-	| [_; _] -> failwith ("Invalid Expression: Only two IDs") 	(* Only 2 items in input list of tokens *)
+	| [_; _] -> failwith ("Invalid Expression: Only two IDs") 		(* Only 2 items in input list of tokens *)
 	(* b should always be a symbol (meaning assignment or math with an L and R) *)
 	| a::b::xs -> match b with 
 		(* Simple variable assignment *)
@@ -57,18 +103,5 @@ let rec parse = function
 			| (T_id, x)  -> 
 				Statement(Var(x), parse_expression xs)
 			| _ -> failwith ("Invalid expression"))
-		| _ -> failwith ("Invalid Expression");;
+		| _ -> failwith ("Invalid Expression")
 
-
-let tokens = [(T_id, "x"); (T_symbol, "="); (T_id, "y")]
-in assert (parse tokens = Statement(Var("x"), Expression(Term(Factor(Var("y"))))))
-
-(*
-let tokens = [(T_id), "x"; (T_symbol), "="; (T_num), "3"]
-in assert (parse tokens = Statement(Var("x"), Expression(Term(Factor(Num"3")))));
-*)
-
-(*
-let tokens = [(T_id), "x"; (T_symbol), "="; (T_num), "1"; (T_symbol), "+"; (T_num), "2"]
-in assert (parse_statement tokens = Statement(Var("x"), Expression_op(Expression(Term(Factor(Num("1")))), Add, Term(Factor(Num("2"))))));
-*)

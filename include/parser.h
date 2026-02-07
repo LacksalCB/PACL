@@ -18,7 +18,7 @@ ast_t* parse_statement(parser_t* parser);
 ast_t* parse_expression(parser_t* parser);
 ast_t* parse_term(parser_t* parser);
 ast_t* parse_factor(parser_t* parser);
-char* parse_id(parser_t* parser);
+char* parse_tok(parser_t* parser);
 
 ast_t* parser_parse(token_t** token_list);
 

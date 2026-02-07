@@ -16,14 +16,16 @@ typedef struct AST_STRUCT{
 		AST_ID,	
 	
 		// STRUCTURAL 			
-		AST_COMPOUND 			//9
+		AST_COMPOUND 			
 	}type;
 
 	struct AST_STRUCT* statement;
 	struct AST_STRUCT* expression;
 	struct AST_STRUCT* term;
 	struct AST_STRUCT* factor;
+	char* op;
 	char* id;
+	char* num;
 
 	struct AST_STRUCT** compound_value;
 	size_t compound_size;
