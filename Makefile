@@ -44,3 +44,5 @@ clean:
 	-rm $(EXEC)
 	-rm $(OBJECTS)
 	-rm $(LOGS)
+	-rm c_out/*
+	-rm out/*
