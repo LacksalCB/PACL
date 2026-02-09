@@ -40,6 +40,7 @@ int main(int argc, char** argv){
 	ast = parser_parse(token_list);
 	out_buff = generate_c_ir(ast);
 	write_file("out/test1.c", out_buff);
+	system("/bin/gcc out/test1.c");
 	
 
 	dealloc();

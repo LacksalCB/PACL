@@ -126,7 +126,7 @@ ast_t* parser_parse(token_t** token_list) {
 	
 	ast_compound->statement = parse_statement(parser);		
 	
-	print_ast(ast_compound);
+	//print_ast(ast_compound);
 
 	free(parser);
 	return ast_compound;

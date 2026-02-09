@@ -16,42 +16,39 @@ void prepend_includes(char* out) {
 */
 
 void write_from_ast(const ast_t* ast, char** c_file, size_t* c_len) {
-	size_t cap = 128;
 	size_t len = 0;
-	char* out = malloc(cap);
+	char* out = malloc(1);
 
 	int curr_type = ast->type;
 	switch(curr_type) {
 		case AST_COMPOUND:
-			print_ast(ast->statement);
+			write_from_ast(ast->statement, c_file, c_len);
 			break;	
 		case AST_STATEMENT:
-			print_ast(ast->expression);
+			write_from_ast(ast->expression, c_file, c_len);
 			break;
 		case AST_EXPRESSION:
-			print_ast(ast->term);
+			write_from_ast(ast->term, c_file, c_len);
 			break;
 		case AST_TERM:
-			print_ast(ast->factor);
+			write_from_ast(ast->factor, c_file, c_len);
 			break;
 		case AST_FACTOR:
- 			int needed = snprintf(NULL, 0, "int %s%s%s", ast->id, ast->op, ast->num);
-			if ((size_t) needed + 1 > cap) {
-				cap = needed + 1;
-				out = realloc(out, cap);
-			}	
-		
-			snprintf(out, cap, "int %s%s%s", ast->id, ast->op, ast->num);
+ 			int needed = snprintf(NULL, 0, "int %s%s%s;", ast->id, ast->op, ast->num)+1; 
+			out = realloc(out, needed);
+
 			len = needed;
+			snprintf(out, len, "int %s%s%s;", ast->id, ast->op, ast->num);
+			out[len-1] = 0;
 			break;
 	};
 
 	char* rest = strdup(*c_file + FIRST_CHAR);	
 	size_t rest_len = strlen(rest);
-	
+
 	*c_file = realloc(*c_file, FIRST_CHAR + len + rest_len + 1);
 	
-	memcpy(*c_file + FIRST_CHAR, out, len);
+	memcpy(*c_file + FIRST_CHAR+1, out, len);
 	strcpy(*c_file + FIRST_CHAR + len, rest);
 
 	free(rest);
@@ -61,7 +58,7 @@ void write_from_ast(const ast_t* ast, char** c_file, size_t* c_len) {
 #define MAIN_SIZE 50 
 // Format and make a basic C main function
 char* append_c_main() {
-	return "int main(int argc, char** argv) {\n\n  return 0;\n}\n";
+	return "int main(int argc, char** argv) {\n\nreturn 0;\n}\n";
 }
 
 char* generate_c_ir(const ast_t* ast){
@@ -69,6 +66,7 @@ char* generate_c_ir(const ast_t* ast){
 	size_t c_len = strlen(c_file);
 
 	write_from_ast(ast, &c_file, &c_len);
+	puts(c_file);
 	
 	return c_file;
 }
