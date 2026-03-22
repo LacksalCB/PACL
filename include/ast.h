@@ -8,36 +8,35 @@
 typedef struct AST_STRUCT{
 	// AST Types
 	enum {
-		AST_ROOT,
-
 		// N-ary compounds
-		AST_COMPOUND,
+		AST_COMPOUND, 					// 0
 
 		// N-ary statements
-		AST_STATEMENT_ASSIGNMENT,
-		AST_STATEMENT_IF,
-		AST_STATEMENT_FOR,
-		AST_STATEMENT_WHILE,
-		AST_STATEMENT_RETURN,
+		AST_STATEMENT_ASSIGNMENT, 		// 1
+		AST_STATEMENT_IF, 				// 2
+		AST_STATEMENT_FOR, 				// 3
+		AST_STATEMENT_WHILE, 			// 4
+		AST_STATEMENT_RETURN, 			// 5
 
 		// Unary expressions
-		AST_EXPRESSION_NOT,
+		AST_EXPRESSION_NOT, 			// 6
 
 		// Binary Expressions
-		AST_EXPRESSION_ADD,
-		AST_EXPRESSION_SUB,
-		AST_EXPRESSION_MUL,
-		AST_EXPRESSION_DIV,
-		AST_EXPRESSION_AND,
-		AST_EXPRESSION_OR,
+		AST_EXPRESSION_ADD, 			// 7
+		AST_EXPRESSION_SUB, 			// 8
+		AST_EXPRESSION_MUL, 			// 9
+		AST_EXPRESSION_DIV, 			// 10
+		AST_EXPRESSION_MOD, 			// 11
+		AST_EXPRESSION_AND, 			// 12
+		AST_EXPRESSION_OR, 				// 13
 
 		// Unary op format
-		AST_UN_OP,
+		AST_UN_OP, 						// 14
 
 		// Binary op format
-		AST_BIN_OP,
-		AST_VAR,
-		AST_NUM
+		AST_BIN_OP, 					// 15
+		AST_VAR, 						// 16
+		AST_NUM 						// 17
 	}type;
 	struct AST_STRUCT* root;
 
@@ -53,9 +52,9 @@ typedef struct AST_STRUCT{
 }ast_t;
 
 ast_t* init_child(int type);
-ast_t** init_compound();
+ast_t** init_compound(int size);
 
-void print_ast(ast_t* ast);
+void print_ast(ast_t* ast, int depth, const char* side);
 
 #endif /* PACL_AST_H */
 

@@ -5,30 +5,37 @@
 #include <ctype.h>
 #include <string.h>
 
-// I already know this is bad, ill make it good one day
-void print_ast(ast_t* ast) {
-	unsigned int curr_type = ast->type;
+#define AST_TYPE(token_type)  (AST_VAR + (token_type) - TOKEN_ID)
 
-	switch(curr_type) {
-		case AST_ROOT:
-			puts("ROOT ->");
-			print_ast(ast->children[0]);
-			break;	
-		case AST_STATEMENT_ASSIGNMENT:
-			puts("  +-> ASSIGNMENT STATEMENT \'=\'->");
-			print_ast(ast->L);
-			print_ast(ast->R);
-			break;
-		case AST_EXPRESSION_ADD:
-			puts("   EXPRESSION ->");
-			break;
-		case AST_VAR:	
-			printf("    +-> L: AST_VAR (Value = \'%s\'\n", ast->value);
-			break;
-		case AST_NUM:
-			printf("    +-> R: AST_NUM (Value = \'%s\'\n", ast->value);
-			break;
-	};
+// Thank you chatgpt for this print function
+void print_ast(ast_t* ast, int depth, const char* side) {
+    if (!ast) return;
+
+    for (int i = 0; i < depth; i++) printf("  ");
+    if (side) printf("%s", side);
+
+    switch(ast->type) {
+        case AST_VAR:
+            printf("AST_VAR (Value = '%s')\n", ast->value);
+            return;
+        case AST_NUM:
+            printf("AST_NUM (Value = '%s')\n", ast->value);
+            return;
+        case AST_COMPOUND:
+            puts("COMPOUND ->");
+            for (int i = 0; ast->children && ast->children[i]; i++) {
+                print_ast(ast->children[i], depth+1, NULL);
+            }
+            return;
+        default:
+            // For operator nodes, use value string if present
+            printf("%s ->\n", ast->value ? ast->value : "UNKNOWN");
+            break;
+    }
+
+    // Recurse on L and R if they exist
+    if (ast->L) print_ast(ast->L, depth+1, "L: ");
+    if (ast->R) print_ast(ast->R, depth+1, "R: ");
 }
 
 parser_t* init_parser(token_t** token_list){
@@ -58,6 +65,9 @@ ast_t* parse_statement(parser_t* parser) {
 		return NULL; // Handle this one day
 	}
 
+	if (parser_peak(parser, 1)->type == TOKEN_EQ){
+		ast = parse_assignment(parser); 
+	}
 	if (!strcmp(parser->current_token->value, "if")) {
 		ast = init_child(AST_STATEMENT_IF);
 	}	
@@ -70,50 +80,97 @@ ast_t* parse_statement(parser_t* parser) {
 	if (!strcmp(parser->current_token->value, "return")) {
 		ast = init_child(AST_STATEMENT_RETURN);
 	}
-	if (parser_peak(parser, 1)->type == TOKEN_EQ){
-		ast = parse_assignment(parser); 	
-	}
+	
+	parser_eat(parser); //Eat semi
 
 	return ast;
 }
 
-ast_t* parse_expression(parser_t* parser) {
-	ast_t* ast = init_child(AST_EXPRESSION_ADD);
-	
-	parser_eat(parser); //Eat semi
-	
-	if (parser->current_token->type != TOKEN_SEMICOLON) { 
-		// Error malformed expression (consequitive IDs)
-		printf("ERROR, INVALID EXPRESSION (expected semicolon): %s\nExpected \'%d\', got \'%d\'\n", parser->current_token->value, TOKEN_SEMICOLON, parser->current_token->type);
-		exit(1);
+ast_t* parse_expression(parser_t* parser, ast_t* ast) {
+	ast->L = init_child(AST_TYPE(parser->current_token->type));
+	ast->L->value = parse_tok(parser);
+	parser_eat(parser);
+
+	parser_eat(parser); // Eat op
+
+	if (parser_peak(parser,1)->type == TOKEN_SEMICOLON) {
+		ast->R = init_child(AST_TYPE(parser->current_token->type));
+		ast->R->value = parse_tok(parser);
+		parser_eat(parser);
+		return ast;
+		
 	}	
+
+	ast->R = parse_expressions(parser);
+
+	return ast;
+}
+
+// Need to insert precedence and term/factor logic here
+ast_t* parse_expressions(parser_t* parser) {
+	ast_t* ast = NULL;
+
+	int op = parser_peak(parser,1)->type;
+
+	switch(op) {
+		case TOKEN_PLUS:
+			ast = init_child(AST_EXPRESSION_ADD);
+			ast->value = "ADDITION EXPRESSION\'+\'";
+			ast = parse_expression(parser, ast);
+			break;
+		case TOKEN_MINUS:
+			ast = init_child(AST_EXPRESSION_SUB);
+			ast->value = "SUBTRACTION EXPRESSION \'-\'";
+			ast = parse_expression(parser, ast);
+			break;
+		case TOKEN_ASTERISK:
+			ast = init_child(AST_EXPRESSION_MUL);
+			ast->value = "MULTIPLICATION EXPRESSION \'*\'";
+			ast = parse_expression(parser, ast);
+			break;
+		case TOKEN_SLASH:
+			ast = init_child(AST_EXPRESSION_DIV);
+			ast->value = "DIVISION EXPRESSION \'/\'";
+			ast = parse_expression(parser, ast);
+			break;
+		case TOKEN_MOD:
+			ast = init_child(AST_EXPRESSION_MOD);
+			ast->value = "DIVISION EXPRESSION \'%\'";
+			ast = parse_expression(parser, ast);
+			break;
+		default:
+			puts("ERROR: INVALID OPERATOR"); // TODO: make this good
+			break;
+	}
 
 	return ast;
 }
 
 ast_t* parse_assignment(parser_t* parser) {
 	ast_t* ast = init_child(AST_STATEMENT_ASSIGNMENT);
-
-	token_t* L_tok = parser->current_token;
-	if (L_tok->type != TOKEN_ID) {
-		// Error, malformed Expression (leading op)
-		printf("ERROR, INVALID EXPRESSION: %s\nExpected id \'%d\', got \'%d\'\n", parser->current_token->value, TOKEN_ID, parser->current_token->type);
-		exit(1);
-	}
+	ast->value = "ASSIGNMENT STATEMENT \'=\'";
+	
+	// L Value check handled in statement	
 	ast->L = init_child(AST_VAR);
 	ast->L->value = parse_tok(parser);
 	parser_eat(parser);	
 
-	parser_eat(parser);
-
+	parser_eat(parser); // eat op
+	
 	token_t* R_tok = parser->current_token;
 	if (R_tok->type != TOKEN_NUM) {
 		// Error, malformed Expression (not num)
 		printf("ERROR, INVALID EXPRESSION: %s\nExpected num \'%d\', got \'%d\'\n", parser->current_token->value, TOKEN_NUM, parser->current_token->type);
 		exit(1);
 	}
-	ast->R = init_child(AST_NUM);
-	ast->R->value = parse_tok(parser);
+
+	if (parser_peak(parser,1)->type == TOKEN_SEMICOLON) {
+		ast->R = init_child(AST_NUM);
+		ast->R->value = parse_tok(parser);	
+		return ast;
+	}
+
+	ast->R = parse_expressions(parser);
 
 	return ast;
 }
@@ -129,15 +186,16 @@ char* parse_tok(parser_t* parser) {
 }
 
 ast_t* parser_parse(token_t** token_list) {
-	ast_t* ast = init_child(AST_ROOT);
-	ast->children = init_compound(); 
+	ast_t* ast = init_child(AST_COMPOUND);
+	ast->value = "ROOT";
+	ast->children = init_compound(1); 
 	
 	parser_t* parser = init_parser(token_list);	
 
-	ast->children[0] = parse_statement(parser);	
+	ast->children[0] = parse_statement(parser);
 
 	puts("AST:");
-	print_ast(ast);
+	print_ast(ast, 0, NULL);
 
 	free(parser);
 	return ast;

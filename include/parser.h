@@ -17,7 +17,7 @@ int parser_eat(parser_t* parser);
 ast_t* parse_assignment(parser_t* parser);
 
 ast_t* parse_statement(parser_t* parser);
-ast_t* parse_expression(parser_t* parser);
+ast_t* parse_expressions(parser_t* parser);
 ast_t* parse_term(parser_t* parser);
 ast_t* parse_factor(parser_t* parser);
 char* parse_tok(parser_t* parser);

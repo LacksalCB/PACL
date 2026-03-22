@@ -34,7 +34,7 @@ Phase 0 Design -> Mathematical Expression Parser:
 	<num> ::= [09]*
 
 0.0 Simple Assignment (DONE)
-0.1 Assignment + Simple OP (IN PROGRESS)
-0.2 Assignment + Complex OP Precedence (TODO)
+0.1 Assignment + Recursive OP (DONE)
+0.2 Assignment + Recursive OP with Precedence (IN PROGRESS)
 0.3 Full Mathematical Expressions (TODO)
 
