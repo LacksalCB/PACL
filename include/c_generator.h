@@ -8,6 +8,6 @@ typedef struct C_IR_STRUCT{
 	size_t size;
 }c_ir_t;
 
-char* generate_c_ir(const ast_t* ast);
+char* generate_c_ir(ast_t* ast);
 
 #endif /* PACL_C_IR_GENERATOR_H */

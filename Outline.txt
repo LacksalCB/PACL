@@ -33,6 +33,8 @@ Phase 0 Design -> Mathematical Expression Parser:
 	<var> ::= [azAz_*09azAZ*]
 	<num> ::= [09]*
 
-For prototyping purposes, have the lexer be in C and read the file, pass that output to a python program to format the output token list into a 
-proper List that ocaml can then parse (i.e. [token_t * string]
+0.0 Simple Assignment (DONE)
+0.1 Assignment + Simple OP (IN PROGRESS)
+0.2 Assignment + Complex OP Precedence (TODO)
+0.3 Full Mathematical Expressions (TODO)
 

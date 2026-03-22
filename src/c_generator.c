@@ -18,28 +18,21 @@ void prepend_includes(char* out) {
 void write_from_ast(const ast_t* ast, char** c_file, size_t* c_len) {
 	size_t len = 0;
 	char* out = malloc(1);
+	unsigned int curr_type = ast->type;
 
-	int curr_type = ast->type;
 	switch(curr_type) {
-		case AST_COMPOUND:
-			write_from_ast(ast->statement, c_file, c_len);
+		case AST_ROOT:
+			write_from_ast(ast->children[0], c_file, c_len);
 			break;	
-		case AST_STATEMENT:
-			write_from_ast(ast->expression, c_file, c_len);
-			break;
-		case AST_EXPRESSION:
-			write_from_ast(ast->term, c_file, c_len);
-			break;
-		case AST_TERM:
-			write_from_ast(ast->factor, c_file, c_len);
-			break;
-		case AST_FACTOR:
- 			int needed = snprintf(NULL, 0, "int %s%s%s;", ast->id, ast->op, ast->num)+1; 
+		case AST_STATEMENT_ASSIGNMENT:
+			int needed = snprintf(NULL, 0, "int %s = %s;", ast->L->value, ast->L->value)+1; 
 			out = realloc(out, needed);
 
 			len = needed;
-			snprintf(out, len, "int %s%s%s;", ast->id, ast->op, ast->num);
+			snprintf(out, len, "int %s = %s;", ast->L->value, ast->R->value);
 			out[len-1] = 0;
+			break;
+		case AST_EXPRESSION_ADD:
 			break;
 	};
 
@@ -53,6 +46,7 @@ void write_from_ast(const ast_t* ast, char** c_file, size_t* c_len) {
 
 	free(rest);
 	free(out);
+
 }
 
 #define MAIN_SIZE 50 
@@ -61,7 +55,9 @@ char* append_c_main() {
 	return "int main(int argc, char** argv) {\n\nreturn 0;\n}\n";
 }
 
-char* generate_c_ir(const ast_t* ast){
+char* generate_c_ir(ast_t* ast){
+	puts("");
+	puts("C CODE:");
 	char* c_file = strdup(append_c_main());
 	size_t c_len = strlen(c_file);
 

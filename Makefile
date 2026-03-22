@@ -34,11 +34,11 @@ install:
 	cp bin/pacl /usr/local/bin/pacl
 
 test:
-	./bin/pacl exampmles/test.pacl
+	./bin/pacl examples/test.pacl
 test1:
 	./bin/pacl examples/1_test.pacl
 test2:
-	./bin/pacl examples/2_test/pacl
+	./bin/pacl examples/2_test.pacl
 
 clean:
 	-rm $(EXEC)

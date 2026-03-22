@@ -24,9 +24,13 @@ void dealloc() {
 		//free(ast[i]);
 	}
 
-	free(ast->statement->expression->term->factor->id);
-	free(ast->statement->expression->term->factor->op);
-	free(ast->statement->expression->term->factor->num);
+	free(ast->children[0]->L->value);
+	free(ast->children[0]->R->value);
+	free(ast->children[0]->L);
+	free(ast->children[0]->R);
+	free(ast->children[0]);
+	free(ast->children);
+	free(ast);
 	
 	free(out_buff);
 }

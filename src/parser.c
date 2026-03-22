@@ -10,22 +10,23 @@ void print_ast(ast_t* ast) {
 	unsigned int curr_type = ast->type;
 
 	switch(curr_type) {
-		case AST_COMPOUND:
-			print_ast(ast->statement);
+		case AST_ROOT:
+			puts("ROOT ->");
+			print_ast(ast->children[0]);
 			break;	
-		case AST_STATEMENT:
-			print_ast(ast->expression);
+		case AST_STATEMENT_ASSIGNMENT:
+			puts("  +-> ASSIGNMENT STATEMENT \'=\'->");
+			print_ast(ast->L);
+			print_ast(ast->R);
 			break;
-		case AST_EXPRESSION:
-			print_ast(ast->term);
+		case AST_EXPRESSION_ADD:
+			puts("   EXPRESSION ->");
 			break;
-		case AST_TERM:
-			print_ast(ast->factor);
+		case AST_VAR:	
+			printf("    +-> L: AST_VAR (Value = \'%s\'\n", ast->value);
 			break;
-		case AST_FACTOR:
-			puts(ast->id);
-			puts(ast->op);
-			puts(ast->num);
+		case AST_NUM:
+			printf("    +-> R: AST_NUM (Value = \'%s\'\n", ast->value);
 			break;
 	};
 }
@@ -49,63 +50,70 @@ token_t* parser_peak(parser_t* parser, int peak_dist) {
 }
 
 ast_t* parse_statement(parser_t* parser) {
-	ast_t* ast = init_ast(AST_STATEMENT);
-	ast->expression = parse_expression(parser);		
+	ast_t* ast = NULL;
+
+	if (parser->current_token->type != TOKEN_ID) {
+		// Has to be a token 
+		printf("ERROR, INVALID STATEMENT: %s\n", parser->current_token->value);
+		return NULL; // Handle this one day
+	}
+
+	if (!strcmp(parser->current_token->value, "if")) {
+		ast = init_child(AST_STATEMENT_IF);
+	}	
+	if (!strcmp(parser->current_token->value, "for")) {
+		ast = init_child(AST_STATEMENT_FOR);
+	}
+	if (!strcmp(parser->current_token->value, "while")) {
+		ast = init_child(AST_STATEMENT_WHILE);
+	}
+	if (!strcmp(parser->current_token->value, "return")) {
+		ast = init_child(AST_STATEMENT_RETURN);
+	}
+	if (parser_peak(parser, 1)->type == TOKEN_EQ){
+		ast = parse_assignment(parser); 	
+	}
 
 	return ast;
 }
 
 ast_t* parse_expression(parser_t* parser) {
-	ast_t* ast = init_ast(AST_EXPRESSION);
-	ast->term = parse_term(parser);
+	ast_t* ast = init_child(AST_EXPRESSION_ADD);
 	
 	parser_eat(parser); //Eat semi
 	
-	if (parser->current_token->type != TOKEN_SEMICOLON) {
-		// Errorm malformed expression (consequitive IDs)
-		printf("ERROR, INVALID EXPRESSION: %s\nExpected \'%d\', got \'%d\'\n", parser->current_token->value, TOKEN_ID, parser->current_token->type);
+	if (parser->current_token->type != TOKEN_SEMICOLON) { 
+		// Error malformed expression (consequitive IDs)
+		printf("ERROR, INVALID EXPRESSION (expected semicolon): %s\nExpected \'%d\', got \'%d\'\n", parser->current_token->value, TOKEN_SEMICOLON, parser->current_token->type);
 		exit(1);
 	}	
 
 	return ast;
 }
 
-ast_t* parse_term(parser_t* parser) {
-	ast_t* ast = init_ast(AST_TERM);
-	ast->factor = parse_factor(parser);
-	
-	return ast;
-}
+ast_t* parse_assignment(parser_t* parser) {
+	ast_t* ast = init_child(AST_STATEMENT_ASSIGNMENT);
 
-
-ast_t* parse_factor(parser_t* parser) {
-	ast_t* ast = init_ast(AST_FACTOR);
-
-	token_t* L = parser->current_token;
-	if (L->type != TOKEN_ID) {
+	token_t* L_tok = parser->current_token;
+	if (L_tok->type != TOKEN_ID) {
 		// Error, malformed Expression (leading op)
-		printf("ERROR, INVALID EXPRESSION: %s\nExpected \'%d\', got \'%d\'\n", parser->current_token->value, TOKEN_ID, parser->current_token->type);
+		printf("ERROR, INVALID EXPRESSION: %s\nExpected id \'%d\', got \'%d\'\n", parser->current_token->value, TOKEN_ID, parser->current_token->type);
 		exit(1);
 	}
-	ast->id = parse_tok(parser);
-
+	ast->L = init_child(AST_VAR);
+	ast->L->value = parse_tok(parser);
 	parser_eat(parser);	
-	token_t* OP = parser->current_token;
-	if (OP->type != TOKEN_EQ) {
-		// Error, malformed Expression (not =)
-		printf("ERROR, INVALID EXPRESSION: %s\nExpected \'%d\', got \'%d\'\n", parser->current_token->value, TOKEN_ID, parser->current_token->type);
-		exit(1);
-	}
-	ast->op = parse_tok(parser);
 
 	parser_eat(parser);
-	token_t* R = parser->current_token;
-	if (R->type != TOKEN_NUM) {
+
+	token_t* R_tok = parser->current_token;
+	if (R_tok->type != TOKEN_NUM) {
 		// Error, malformed Expression (not num)
-		printf("ERROR, INVALID EXPRESSION: %s\nExpected \'%d\', got \'%d\'\n", parser->current_token->value, TOKEN_ID, parser->current_token->type);
+		printf("ERROR, INVALID EXPRESSION: %s\nExpected num \'%d\', got \'%d\'\n", parser->current_token->value, TOKEN_NUM, parser->current_token->type);
 		exit(1);
 	}
-	ast->num = parse_tok(parser);
+	ast->R = init_child(AST_NUM);
+	ast->R->value = parse_tok(parser);
 
 	return ast;
 }
@@ -121,14 +129,17 @@ char* parse_tok(parser_t* parser) {
 }
 
 ast_t* parser_parse(token_t** token_list) {
-	ast_t* ast_compound = init_ast(AST_COMPOUND);
+	ast_t* ast = init_child(AST_ROOT);
+	ast->children = init_compound(); 
+	
 	parser_t* parser = init_parser(token_list);	
-	
-	ast_compound->statement = parse_statement(parser);		
-	
-	//print_ast(ast_compound);
+
+	ast->children[0] = parse_statement(parser);	
+
+	puts("AST:");
+	print_ast(ast);
 
 	free(parser);
-	return ast_compound;
+	return ast;
 }
 

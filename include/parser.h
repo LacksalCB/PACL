@@ -14,6 +14,8 @@ parser_t* init_parser(token_t** tokeen_list);
 
 int parser_eat(parser_t* parser);
 
+ast_t* parse_assignment(parser_t* parser);
+
 ast_t* parse_statement(parser_t* parser);
 ast_t* parse_expression(parser_t* parser);
 ast_t* parse_term(parser_t* parser);
