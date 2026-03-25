@@ -11,7 +11,6 @@ ast_t* init_child(int type){
 	ast->R = NULL;
 
 	ast->children = NULL;
-	printf("%d\n",ast->type);
 
 	return ast;
 }

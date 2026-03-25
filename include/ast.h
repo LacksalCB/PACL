@@ -7,6 +7,10 @@
 
 typedef struct AST_STRUCT{
 	// AST Types
+
+
+	// TODO: Handle all Expression/Statement cases
+	// TODO: Basically add support for C style op precedence
 	enum {
 		// N-ary compounds
 		AST_COMPOUND, 					// 0
@@ -28,15 +32,18 @@ typedef struct AST_STRUCT{
 		AST_EXPRESSION_DIV, 			// 10
 		AST_EXPRESSION_MOD, 			// 11
 		AST_EXPRESSION_AND, 			// 12
-		AST_EXPRESSION_OR, 				// 13
+		AST_EXPRESSION_XOR, 			// 13
+		AST_EXPRESSION_OR, 				// 14
+		AST_EXPRESSION_BWLS, 			// 15
+		AST_EXPRESSION_BWRS, 			// 16
 
 		// Unary op format
-		AST_UN_OP, 						// 14
+		AST_UN_OP, 						// 17
 
 		// Binary op format
-		AST_BIN_OP, 					// 15
-		AST_VAR, 						// 16
-		AST_NUM 						// 17
+		AST_BIN_OP, 					// 18
+		AST_VAR, 						// 19
+		AST_NUM 						// 20
 	}type;
 	struct AST_STRUCT* root;
 

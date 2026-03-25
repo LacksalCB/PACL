@@ -39,6 +39,8 @@ test1:
 	./bin/pacl examples/1_test.pacl
 test2:
 	./bin/pacl examples/2_test.pacl
+test3:
+	./bin/pacl examples/3_test.pacl
 
 clean:
 	-rm $(EXEC)

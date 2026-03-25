@@ -6,8 +6,34 @@
 char* buff;
 token_t** token_list;
 int token_count = 0;
+int line_count = 0;
 ast_t* ast;
 char* out_buff;
+
+void dealloc_ast(ast_t* ast) {
+    if (!ast) return;
+    switch(ast->type) {
+        case AST_VAR:
+			free(ast->value);
+			free(ast);
+            return;
+        case AST_NUM:
+			free(ast->value);
+			free(ast);
+            return;
+        case AST_COMPOUND:
+            for (int i = 0; ast->children && ast->children[i]; i++) {
+                dealloc_ast(ast->children[i]);
+            }
+            return;
+        default:
+            break;
+    }
+
+    // Recurse on L and R if they exist
+    if (ast->L) dealloc_ast(ast->L);
+    if (ast->R) dealloc_ast(ast->R);
+}
 
 void dealloc() {
 	free(buff);
@@ -20,17 +46,7 @@ void dealloc() {
 	
 	free(token_list);
 
-	for (int i = 0; i < 1; i++) {
-		//free(ast[i]);
-	}
-
-	free(ast->children[0]->L->value);
-	free(ast->children[0]->R->value);
-	free(ast->children[0]->L);
-	free(ast->children[0]->R);
-	free(ast->children[0]);
-	free(ast->children);
-	free(ast);
+	dealloc_ast(ast);
 	
 	free(out_buff);
 }
@@ -64,10 +80,10 @@ int main(int argc, char** argv){
 
 	char* file = argv[1];
 	buff = read_file(file);
-	token_list = lexer_tokenize(buff, &token_count);
-	ast = parser_parse(token_list);
+	token_list = lexer_tokenize(buff, &token_count, &line_count);
+	ast = parser_parse(token_list, line_count);
 	out_buff = generate_c_ir(ast);
-	write_file("c_out/1_test.c", out_buff);
+	write_file("c_out/3_test.c", out_buff);
 	c_compile(file);
 
 	dealloc();

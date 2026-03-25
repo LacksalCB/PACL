@@ -22,8 +22,26 @@ COMPILATION STEPS FOR MY OWN SANITY:
 AST STRUCTURE
 	a. 
 
+C operator precedence:
+1. Postfix inc/dec
+2. Prefix inc/dec, unary +/-, Logical/bitwise NOT
+3. Multiplication, Division, mod
+4. Addition, Subtraction
+5. Bitwise shifting
+6. Comparisons <, <=
+7. == !=
+8. &  bitwise AND
+9. ^  bitwise XOR
+10. | bitwise OR
+11. && Logical AND
+12. || Logical OR
+13. Ternary ? :
+14. = assignment, +=,-=, assignment by OP
+15. comma ,
 
 
+
+// TODO: Add bitwise operators
 Effectively creating a deterministic CFL to represent language in AST
 Phase 0 Design -> Mathematical Expression Parser:
 	<stmt> ::= <id> = <exp> 

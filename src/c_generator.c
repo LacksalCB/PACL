@@ -15,39 +15,35 @@ void prepend_includes(char* out) {
 }
 */
 
-void write_from_ast(const ast_t* ast, char** c_file, size_t* c_len) {
-	size_t len = 0;
-	char* out = malloc(1);
-	unsigned int curr_type = ast->type;
+// Thank you chatgpt for this print function
+void write_from_ast(ast_t* ast, char** c_file, size_t* c_len) {
+    if (!ast) return;
 
-	switch(curr_type) {
-		case AST_ROOT:
-			write_from_ast(ast->children[0], c_file, c_len);
-			break;	
-		case AST_STATEMENT_ASSIGNMENT:
-			int needed = snprintf(NULL, 0, "int %s = %s;", ast->L->value, ast->L->value)+1; 
-			out = realloc(out, needed);
+    switch(ast->type) {
+        case AST_VAR:
+           	
+            return;
+        case AST_NUM:
+            printf("AST_NUM (Value = '%s')\n", ast->value);
+            return;
+        case AST_COMPOUND:
+            puts("COMPOUND ->");
+            for (int i = 0; ast->children && ast->children[i]; i++) {
+                write_c_file(ast->children[i], c_file, c_len);
+            }
+            return;
+        default:
+            // For operator nodes, use value string if present
+            printf("%s ->\n", ast->value ? ast->value : "UNKNOWN");
+            break;
+    }
 
-			len = needed;
-			snprintf(out, len, "int %s = %s;", ast->L->value, ast->R->value);
-			out[len-1] = 0;
-			break;
-		case AST_EXPRESSION_ADD:
-			break;
-	};
-
-	char* rest = strdup(*c_file + FIRST_CHAR);	
-	size_t rest_len = strlen(rest);
-
-	*c_file = realloc(*c_file, FIRST_CHAR + len + rest_len + 1);
-	
-	memcpy(*c_file + FIRST_CHAR+1, out, len);
-	strcpy(*c_file + FIRST_CHAR + len, rest);
-
-	free(rest);
-	free(out);
-
+    // Recurse on L and R if they exist
+    if (ast->L) write_c_file(ast->L, c_file, c_len);
+    if (ast->R) write_c_file(ast->R, c_file, c_len);
 }
+
+
 
 #define MAIN_SIZE 50 
 // Format and make a basic C main function
@@ -66,4 +62,3 @@ char* generate_c_ir(ast_t* ast){
 	
 	return c_file;
 }
-

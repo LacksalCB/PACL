@@ -22,6 +22,6 @@ ast_t* parse_term(parser_t* parser);
 ast_t* parse_factor(parser_t* parser);
 char* parse_tok(parser_t* parser);
 
-ast_t* parser_parse(token_t** token_list);
+ast_t* parser_parse(token_t** token_list, int len);
 
 #endif /* PACL_PARSER_H */
