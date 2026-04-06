@@ -29,7 +29,7 @@ void write_from_ast(ast_t* ast, char** c_file, size_t* c_len) {
         case AST_COMPOUND:
             puts("COMPOUND ->");
             for (int i = 0; ast->children && ast->children[i]; i++) {
-                write_c_file(ast->children[i], c_file, c_len);
+                write_from_ast(ast->children[i], c_file, c_len);
             }
             return;
         default:
@@ -39,8 +39,8 @@ void write_from_ast(ast_t* ast, char** c_file, size_t* c_len) {
     }
 
     // Recurse on L and R if they exist
-    if (ast->L) write_c_file(ast->L, c_file, c_len);
-    if (ast->R) write_c_file(ast->R, c_file, c_len);
+    if (ast->L) write_from_ast(ast->L, c_file, c_len);
+    if (ast->R) write_from_ast(ast->R, c_file, c_len);
 }
 
 

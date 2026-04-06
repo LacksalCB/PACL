@@ -92,23 +92,15 @@ ast_t* parse_statement(parser_t* parser) {
 	return ast;
 }
 
-ast_t* parse_factor(parser_t* parser) {
-
-}
-
-
-ast_t* parse_term(parser_t* parser) {
-
-
-}
-
 ast_t* parse_expression(parser_t* parser, ast_t* ast) {
+	// Parse L
 	ast->L = init_child(AST_TYPE(parser->current_token->type));
 	ast->L->value = parse_tok(parser);
 	parser_eat(parser);
 
 	parser_eat(parser); // Eat op
 
+	// Parse R
 	if (parser_peak(parser, 1)->type == TOKEN_SEMICOLON) {
 		ast->R = init_child(AST_TYPE(parser->current_token->type));
 		ast->R->value = parse_tok(parser);
@@ -121,6 +113,22 @@ ast_t* parse_expression(parser_t* parser, ast_t* ast) {
 
 	return ast;
 }
+
+// y = 1 * 2 + 3
+// ADD
+//  Mul
+//   1
+//   2
+//  3
+
+
+// x = 1 + 2 * 3
+// ADD 
+// 	1
+// 	Mul
+// 	  2
+// 	  3
+
 
 // Need to insert precedence and term/factor logic here
 ast_t* parse_expressions(parser_t* parser) {
@@ -255,6 +263,8 @@ ast_t* parser_parse(token_t** token_list, int len) {
 	for (int i = 0; i < len-2; i++) {
 		ast->children[i] = parse_statement(parser);
 	}
+
+	print_ast(ast, 0, NULL);
 
 	free(parser);
 	return ast;

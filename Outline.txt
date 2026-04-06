@@ -39,7 +39,8 @@ C operator precedence:
 14. = assignment, +=,-=, assignment by OP
 15. comma ,
 
-
+int y = 0
+int x = y++ * --y + 1 << 2 < 3 == 4 & 5 ^ 6 | 7 && 8 || y == 1 ? 2 : 3, y = 1;
 
 // TODO: Add bitwise operators
 Effectively creating a deterministic CFL to represent language in AST
